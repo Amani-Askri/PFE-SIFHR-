@@ -21,7 +21,7 @@ class RAGTool:
         collection_name = "data_sifhr"
         retriever = create_vectorstore_retriever(collection_name, self.embedding_model)
         self.retriever = get_multi_query_retriever(self.llm, retriever)
-#PROMPT
+#PROMPT ***
         # Prompt dynamique pour scénarios immersifs
         prompt_prefix = """Tu es un maître de jeu spécialisé dans la création de scénarios immersifs 
 inspirés de l'histoire, des légendes et des civilisations arabo-musulmanes. 
