@@ -1,6 +1,6 @@
 from langchain.retrievers.multi_query import MultiQueryRetriever
 from langchain_community.vectorstores import Milvus
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_anthropic import ChatAnthropic
 from config import Config
 
 
@@ -21,9 +21,9 @@ def create_vectorstore_retriever(collection_name, embedding_model):
 
 
 def get_llm():
-    return ChatGoogleGenerativeAI(
-        google_api_key=Config.GOOGLE_API_KEY,
-        model=Config.GEMINI_MODEL,
-        temperature=0.1,
-        convert_system_message_to_human=True
+    return ChatAnthropic(
+        anthropic_api_key=Config.ANTHROPIC_API_KEY,
+        model=Config.CLAUDE_MODEL,
+        temperature=0.7,
+        max_tokens=None
     )
