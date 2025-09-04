@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Communication API SIFHR</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
+        button { background: #007bff; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; margin: 10px 0; }
+        button:hover { background: #0056b3; }
+        #result { margin-top: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background: #f9f9f9; }
+        .error { background: #ffe6e6; border-color: #ff9999; }
+        .success { background: #e6ffe6; border-color: #99ff99; }
+    </style>
+</head>
+<body>
+    <h1>🏺 Test Communication Frontend React ↔ API RAG SIFHR</h1>
+    
+    <p><strong>Frontend React:</strong> http://localhost:5174</p>
+    <p><strong>API Backend:</strong> http://localhost:8000</p>
+    
+    <button onclick="testHealth()">Test Health API</button>
+    <button onclick="testChat()">Test Chat API (Agent RAG)</button>
+    <button onclick="testChatFromReact()">Test depuis React App</button>
+    
+    <div id="result"></div>
+    
+    <script>
+        function displayResult(content, isError = false) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = content;
+            resultDiv.className = isError ? 'error' : 'success';
+        }
+        
+        async function testHealth() {
+            displayResult('Test en cours...', false);
+            try {
+                const response = await fetch('http://localhost:8000/health');
+                const data = await response.json();
+                
+                displayResult(`
+                    <h3>✅ Health API - Succès!</h3>
+                    <p><strong>Status:</strong> ${data.status}</p>
+                    <p><strong>Message:</strong> ${data.message}</p>
+                    <p><strong>Code HTTP:</strong> ${response.status}</p>
+                `);
+            } catch (error) {
+                displayResult(`
+                    <h3>❌ Erreur Health API</h3>
+                    <p><strong>Erreur:</strong> ${error.message}</p>
+                `, true);
+            }
+        }
+        
+        async function testChat() {
+            displayResult('Test Chat API en cours...', false);
+            try {
+                const response = await fetch('http://localhost:8000/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: 'Test communication depuis navigateur - créer un scénario de palais',
+                        session_id: 'test_browser_session'
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                displayResult(`
+                    <h3>✅ Chat API (Agent RAG) - Succès!</h3>
+                    <p><strong>Code HTTP:</strong> ${response.status}</p>
+                    <p><strong>Session ID:</strong> ${data.session_id}</p>
+                    <p><strong>Réponse générée:</strong> ${data.response.length} caractères</p>
+                    <p><strong>Sources:</strong> ${data.sources.length} documents</p>
+                    <details>
+                        <summary>Voir le scénario généré</summary>
+                        <pre style="white-space: pre-wrap; font-size: 12px; max-height: 200px; overflow: auto;">${data.response}</pre>
+                    </details>
+                `);
+            } catch (error) {
+                displayResult(`
+                    <h3>❌ Erreur Chat API</h3>
+                    <p><strong>Erreur:</strong> ${error.message}</p>
+                    <p><strong>Type:</strong> ${error.name}</p>
+                `, true);
+            }
+        }
+        
+        function testChatFromReact() {
+            displayResult(`
+                <h3>🔗 Test depuis React App</h3>
+                <p>Ouvrez l'application React à <a href="http://localhost:5174" target="_blank">localhost:5174</a></p>
+                <p>Et tapez un message comme: <strong>"Créer un scénario de chasse au trésor à Cordoue"</strong></p>
+                <p>Si cela fonctionne, vous devriez voir un scénario généré par l'agent RAG.</p>
+                <p>Si cela ne fonctionne pas, ouvrez la console développeur (F12) pour voir les erreurs.</p>
+            `);
+        }
+        
+        // Auto-test au chargement
+        window.onload = function() {
+            displayResult('Prêt pour les tests. Cliquez sur un bouton ci-dessus.');
+        };
+    </script>
+</body>
+</html>
